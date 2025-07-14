@@ -1,26 +1,26 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'node:18'
+        }
+    }
+
+    environment {
+        SRC_FILE = '/data/README.txt'
+        DEST_FOLDER = '/data/backup_devops'
+    }
 
     stages {
-        stage('Clone') {
+        stage('Verify Paths') {
             steps {
-                git 'https://github.com/Ihaider01/practice_backup.git'
+                sh 'echo "Backing up $SRC_FILE to $DEST_FOLDER"'
+                sh 'ls -l /data'
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Copy File') {
             steps {
-                script {
-                    dockerImage = docker.build("jenkins-backup-app")
-                }
-            }
-        }
-
-        stage('Run Docker Container') {
-            steps {
-                script {
-                    dockerImage.run('-v /d/README.txt:/data/README.txt -v /d/backup_devops:/data/backup_devops')
-                }
+                sh 'cp $SRC_FILE $DEST_FOLDER'
             }
         }
     }
